@@ -18,11 +18,11 @@ The focus is on **interactive exploration** and **improving retrieval systems** 
 
 #### **2D Visualization**
 The following image shows a **2D embedding space**, reduced from high dimensions:
-![2D VIS](../images/2DVIS.png)
+![2D VIS](./images/2DVIS.png)
 
 #### **3D Visualization**
 Here’s an interactive **3D visualization** of the same embedding space:
-![3D VIS](../images/3DVIS.png)
+![3D VIS](./images/3DVIS.png)
 
 ---
 
