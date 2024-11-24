@@ -1,157 +1,130 @@
-# MRID Expert Knowledge Worker
-
-## Overview
-The MRID Expert Knowledge Worker is a question-answering agent designed to serve as an expert knowledge assistant for employees of **MRID COMPANY**, an Insurance Tech company. By leveraging **Retrieval Augmented Generation (RAG)**, the system ensures high accuracy while maintaining low costs, addressing the company's need for precise and reliable responses without introducing unnecessary expenses.
-
-## Key Features
-
-- **High Accuracy with RAG**: The agent employs Retrieval Augmented Generation, a cutting-edge technique that retrieves relevant context before generating responses, ensuring answers are both factual and relevant.
-- **Low Cost**: Utilizes the "gpt-4o-mini" model, balancing performance and cost to meet budget constraints.
-- **Context-Aware**: Capable of parsing through employee and product knowledge bases to provide specific and accurate answers.
-- **Prevention of Hallucination**: Configured with a system prompt to avoid generating information outside of the provided context.
-
-## Use Cases
-
-- Assisting employees in retrieving information about internal policies, products, and employee records.
-- Answering questions about company operations, product features, and career progression.
-- Supporting HR and management in responding to employee inquiries efficiently.
+Here’s a revised version of the README that includes details on the project, visualization, and the requested image (`ragchat.png`):
 
 ---
 
-## Technical Details
+# **Expert Knowledge Worker: RAG-based Interactive Chat with FAISS Vector Search**
 
-### System Components
+### **Overview**
+This project demonstrates the power of **Retrieval-Augmented Generation (RAG)** combined with **FAISS vector search** for creating an intelligent and interactive knowledge worker. The system allows users to search, interact, and retrieve information from a large knowledge base using semantic vector search, enhanced by a language model (GPT). The embeddings are visualized using **2D and 3D** plots for better understanding of the knowledge space, empowering the system with smarter retrieval capabilities.
 
-1. **Model**:
-   - `MODEL = "gpt-4o-mini"`
-   - Selected for its balance of cost-efficiency and capability.
+This project utilizes **LangChain** to handle document loading, text splitting, vectorization, and interactive querying, while **FAISS** manages the storage and retrieval of vector embeddings.
 
-2. **Environment Setup**:
-   - Environment variables are managed using a `.env` file for secure storage of API keys.
-   ```python
-   load_dotenv()
-   os.environ['OPENAI_API_KEY'] = os.getenv('OPENAI_API_KEY')
-   openai = OpenAI()
+---
+
+### **Project Flow**
+1. **Knowledge Base Loading:**
+   - Text documents are loaded from multiple subfolders and processed using **LangChain’s DirectoryLoader** and **TextLoader**.
+   
+2. **Text Splitting:**
+   - Documents are split into smaller chunks using **CharacterTextSplitter**, making it easier to handle and index specific sections of information.
+
+3. **Embedding & Vectorization:**
+   - Each document chunk is converted into a vector embedding using **OpenAIEmbeddings** and stored in a **FAISS vector store** for efficient retrieval.
+
+4. **Dimensionality Reduction:**
+   - **t-SNE** is used to reduce the high-dimensional embeddings into 2D and 3D spaces for visualization. This makes it easier to interpret the semantic relationships between the document chunks.
+
+5. **RAG-based Search:**
+   - The retrieval-augmented generation approach is used with **OpenAI's GPT model** to answer user queries based on the context of the vector store.
+   
+6. **Gradio Interface:**
+   - A **Gradio** interface is implemented to provide a user-friendly chatbot experience for querying the knowledge base in real-time.
+
+---
+
+### **Visual Examples**
+
+#### **2D Vector Visualization**
+The following is a **2D visualization** of the FAISS vector store, where each point represents a document chunk, and the colors differentiate document types (products, employees, contracts, etc.):
+![](./2DVIS.PNG)
+
+#### **3D Vector Visualization**
+Here’s a **3D visualization** of the same embedding space, allowing users to explore the vector relationships in three dimensions:
+![](./3DVIS.PNG)
+
+#### **RAG Chat Interface**
+The system’s **RAG-powered chat interface** allows users to interact with the knowledge base. Below is an example of how the system answers a query in an interactive chat interface:
+![](./ragchat.png)
+
+---
+
+### **Key Features**
+- **Document Loading and Preprocessing:** Automatically loads documents from specified directories, splits them into manageable chunks, and prepares them for vectorization.
+- **Vector Store:** Uses **FAISS** to efficiently store and retrieve vector embeddings, which represent the semantic meaning of each chunk of text.
+- **Dimensionality Reduction:** Reduces high-dimensional vectors to 2D and 3D for interactive visualization.
+- **RAG for Smart Retrieval:** Combines **vector search** with **GPT-based generation** to provide accurate, context-aware answers to user queries.
+- **Gradio Interface:** Provides an easy-to-use chat interface for interacting with the knowledge base in real time.
+
+---
+
+### **Getting Started**
+
+#### **Prerequisites**
+- Python 3.8 or later
+- OpenAI API Key
+- Install necessary Python libraries with the provided `requirements.txt`
+
+#### **Installation**
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   ```
+2. Navigate to the project folder:
+   ```bash
+   cd <project-folder>
+   ```
+3. Install dependencies:
+   ```bash
+   pip install -r requirements.txt
    ```
 
-3. **Knowledge Bases**:
-   - **Employee Knowledge Base**: Stores employee-related documents categorized by names.
-   - **Product Knowledge Base**: Stores product-related documentation, such as feature details, pricing, and roadmaps.
-
-4. **System Prompt**:
-   - A dedicated system message guides the model to:
-     - Provide accurate, concise answers.
-     - Refrain from generating information outside the provided context.
-   ```
-   system_message = "You are an expert in answering accurate questions about Insurellm, the Insurance Tech company. Give brief, accurate answers. If you don't know the answer, say so. Do not make anything up if you haven't been provided with relevant context."
-   ```
-
-### Context Retrieval Functionality
-
-- **Context Loading**:
-  Employee and product data are dynamically loaded from their respective directories.
-  ```python
-  employees = glob.glob("knowledge-base/employees/*")
-  products = glob.glob("knowledge-base/products/*")
-  ```
-
-- **Relevance Matching**:
-  The system identifies relevant documents based on user queries.
-  ```python
-  def get_relevant_context(message):
-      relevant_context = []
-      for context_title, context_details in context.items():
-          if context_title.lower() in message.lower():
-              relevant_context.append(context_details)
-      return relevant_context
-  ```
-
-- **Augmented Responses**:
-  Provides additional relevant context to enhance the accuracy of responses.
-  ```python
-  def add_context(message):
-      relevant_context = get_relevant_context(message)
-      if relevant_context:
-          message += "\n\nThe following additional context might be relevant in answering this question:\n\n"
-          for relevant in relevant_context:
-              message += relevant + "\n\n"
-      return message
-  ```
-
-### Example Query
-
-**Input:**
-```plaintext
-Who is Alex Lancaster?
-```
-
-**Output:**
-```plaintext
-Who is Alex Lancaster?
-
-The following additional context might be relevant in answering this question:
-
-# Avery Lancaster
-
-## Summary
-- **Date of Birth**: March 15, 1985  
-- **Job Title**: Co-Founder & Chief Executive Officer (CEO)  
-- **Location**: San Francisco, California  
-... (Additional details)
+#### **Setup Environment**
+Make sure you have your **OpenAI API key** set up in the `.env` file. Here’s an example:
+```bash
+OPENAI_API_KEY=<your-api-key>
 ```
 
 ---
 
-## How to Use
-
-1. **Setup Environment**:
-   - Add the OpenAI API key to a `.env` file:
-   ```plaintext
-   OPENAI_API_KEY=your_openai_api_key_here
-   ```
-
-2. **Run the Script**:
-   - Install required dependencies:
-   ```bash
-   pip install python-dotenv gradio openai
-   ```
-   - Execute the script:
-   ```bash
-   python main.py
-   ```
-
-3. **Query the System**:
-   - Use the interface to ask questions about employees, products, or general company details.
+### **How It Works**
+1. **Document Loading:**
+   - The script loads documents from the `knowledge-base` folder using LangChain's loaders.
+   
+2. **Text Splitting:**
+   - Documents are split into chunks, and metadata about each chunk is stored (e.g., document type).
+   
+3. **FAISS Vector Store:**
+   - The chunks are vectorized using OpenAI's embeddings and stored in a **FAISS** vector store for efficient search.
+   
+4. **Visualization:**
+   - **t-SNE** is used to reduce the dimensionality of the vector space, and Plotly is used to create interactive 2D and 3D visualizations of the embeddings.
+   
+5. **RAG Chat:**
+   - The system answers questions by combining the embeddings with a language model (GPT), retrieving relevant information from the vector store and generating responses.
+   
+6. **Gradio Interface:**
+   - The **Gradio** interface allows users to input questions, interact with the knowledge base, and get real-time answers.
 
 ---
 
-## Future Enhancements
-
-- **Extended Knowledge Base**: Integration with additional databases for broader coverage.
-- **Advanced Search**: Implement semantic search capabilities for improved context matching.
-- **Real-Time Updates**: Enable real-time data ingestion to keep the knowledge base up-to-date.
-- **Customizable User Roles**: Allow different levels of access for employees based on roles and departments.
-
----
-
-## Contribution
-
-If you wish to contribute to the project:
-1. Fork the repository.
-2. Create a feature branch.
-3. Submit a pull request with detailed explanations of your changes.
+### **Example Query**
+For example, if you ask the system:  
+`"Can you describe Insurellm in a few sentences?"`  
+It generates the following response:
+> Insurellm is an innovative insurance tech startup founded by Avery Lancaster in 2015, aimed at disrupting the insurance industry with its range of software products. The company, which has grown to 200 employees and operates 12 offices across the US by 2024, offers four main products: Carllm for auto insurance, Homellm for home insurance, Rellm for the reinsurance sector, and Marketllm, a marketplace connecting consumers with insurance providers. With over 300 clients worldwide, Insurellm focuses on delivering reliable and transformative solutions in the insurance market.
 
 ---
 
-## License
-This project is licensed under the MIT License. See the LICENSE file for details.
+### **Future Work**
+- Add more advanced visualization techniques (e.g., t-SNE animation).
+- Extend the project to support additional data types such as images and audio.
+- Implement a more advanced user interface for managing and querying the knowledge base.
 
 ---
 
-## Acknowledgements
+### **Contact**
+For further questions or collaboration, please contact [Your Name/Your Team] at [Your Email/Contact Info].
 
-- **OpenAI**: For providing the GPT model API.
-- **Gradio**: For building the user-friendly interface.
-- **MRID COMPANY**: For inspiring the development of this expert knowledge worker.
+--- 
 
-
+This updated README focuses on the core functionalities of your project while including clear references to the **visualizations** and **RAG-based chat interface**. It integrates the images (`2DVIS.PNG`, `3DVIS.PNG`, and `ragchat.png`) as specified. Let me know if you need further modifications!
